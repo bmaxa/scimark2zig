@@ -6,10 +6,11 @@ const montecarlo = @import("MonteCarlo.zig");
 const sparse = @import("SparseCompRow.zig");
 const lu = @import("lu.zig");
 const array = @import("array.zig");
-const heap = @import("std").heap;
+const allocator = @import("allocator.zig").allocator;
 pub fn measureFFT(N:i32,min_time:f64,R:* random.Random)!f64 {
   const twoN = 2*N;
   const x = try R.vector(twoN);
+  defer allocator().free(x);
   var cycles:i32 = 1;
   var start:i64 = undefined;
   while(true):(cycles *= 2) {
@@ -26,6 +27,7 @@ pub fn measureFFT(N:i32,min_time:f64,R:* random.Random)!f64 {
 }
 pub fn measureSOR(N:i32,min_time:f64,R:* random.Random)!f64{
   const G = try R.matrix(N,N);
+  defer array.Array2D_double_delete(G);
   var cycles:i32 = 1;
   var start:i64 = undefined;
   while (true):(cycles*=2) {
@@ -51,16 +53,21 @@ pub fn measureMonteCarlo(min_time:f64,R:*random.Random)f64{
 }
 pub fn measureSparseMatMult(N:i32,nz:i32,min_time:f64,R:*random.Random)anyerror!f64{
   const x = try R.vector(N);
-  const y = try heap.c_allocator.alloc(f64,@intCast(usize,N));
+  defer allocator().free(x);
+  const y = try allocator().alloc(f64,@intCast(usize,N));
+  defer allocator().free(y);
   init(y);
 
   const nr = @divTrunc(nz,N);
   const anz = nr * N;
 
   const val = try R.vector(anz);
-  const col = try heap.c_allocator.alloc(i32,@intCast(usize,nz));
+  defer allocator().free(val);
+  const col = try allocator().alloc(i32,@intCast(usize,nz));
+  defer allocator().free(col);
   init(col);
-  const row = try heap.c_allocator.alloc(i32,@intCast(usize,N+1));
+  const row = try allocator().alloc(i32,@intCast(usize,N+1));
+  defer allocator().free(row);
   init(row);
 
   var cycles:i32 = 1;
@@ -95,7 +102,8 @@ pub fn measureLU(N:i32,min_time:f64,R:* random.Random)anyerror!f64{
 
   const A = try R.matrix(N,N);
   const alu = try array.new_Array2D_double(N,N);
-  const pivot = try heap.c_allocator.alloc(usize,@intCast(usize,N));
+  const pivot = try allocator().alloc(usize,@intCast(usize,N));
+  defer allocator().free(pivot);
   init(pivot);
   var sum:usize = 0;
   while (true):(cycles*=2){

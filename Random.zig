@@ -1,3 +1,4 @@
+const allocator = @import("allocator.zig").allocator;
 const MDIG = 32;
 const ONE = 1;
 const m1 = (ONE << (MDIG - 2)) + ((ONE << (MDIG - 2)) - ONE);
@@ -15,18 +16,16 @@ pub const Random = struct {
   right:f64,
   width:f64,
   pub fn vector(self:* Random,N:i32)![]f64{
-    const alloc = heap.c_allocator;
-    var rc:[]f64 = try alloc.alloc(f64,@intCast(usize,N)); //[_]f64{0} ** ;
+    var rc:[]f64 = try allocator().alloc(f64,@intCast(usize,N)); //[_]f64{0} ** ;
     for (rc) |*v| {
       v.* = self.nextDouble();
     }
     return rc;
   }
   pub fn matrix(self:*Random,M:i32,N:i32)anyerror![][]f64 {
-    const alloc = heap.c_allocator;
-    var rc:[][]f64 = try alloc.alloc([]f64,@intCast(usize,M));
+    var rc:[][]f64 = try allocator().alloc([]f64,@intCast(usize,M));
     for (rc) |*row| {
-      row.* = try alloc.alloc(f64,@intCast(usize,N));
+      row.* = try allocator().alloc(f64,@intCast(usize,N));
       for (row.*) |*v| {
         v.* = self.nextDouble();
       }
