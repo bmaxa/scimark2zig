@@ -52,29 +52,32 @@ pub fn measureMonteCarlo(min_time:f64,R:*random.Random)f64{
 pub fn measureSparseMatMult(N:i32,nz:i32,min_time:f64,R:*random.Random)anyerror!f64{
   const x = try R.vector(N);
   const y = try heap.c_allocator.alloc(f64,@intCast(usize,N));
+  init(y);
 
   const nr = @divTrunc(nz,N);
   const anz = nr * N;
 
   const val = try R.vector(anz);
-  const col = try heap.c_allocator.alloc(f64,@intCast(usize,nz));
-  const row = try heap.c_allocator.alloc(f64,@intCast(usize,N+1));
+  const col = try heap.c_allocator.alloc(i32,@intCast(usize,nz));
+  init(col);
+  const row = try heap.c_allocator.alloc(i32,@intCast(usize,N+1));
+  init(row);
 
   var cycles:i32 = 1;
 
   var r:usize = 0;
   while (r<N):(r+=1){
-    const rowr = @floatToInt(usize,row[r]);
+    const rowr = @intCast(usize,row[r]);
     var step =@divTrunc( @intCast(i32,r),nr);
 
-    row[r+1] = @intToFloat(f64,@intCast(i32,rowr) + nr);
+    row[r+1] = @intCast(i32,rowr) + nr;
 
     if (step < 1) {
       step = 1;
     }
     var i:usize = 0;
     while (i<nr):(i+=1){
-      col[rowr+i] = @intToFloat(f64,@intCast(i32,i) * step);
+      col[rowr+i] = @intCast(i32,i) * step;
     }
   }
   var start:i64 = 0;
@@ -87,12 +90,14 @@ pub fn measureSparseMatMult(N:i32,nz:i32,min_time:f64,R:*random.Random)anyerror!
   return sparse.num_flops(N,nz,cycles)/@intToFloat(f64,time.timestamp()-start) * 1e-6;
 }
 pub fn measureLU(N:i32,min_time:f64,R:* random.Random)anyerror!f64{
-  var cycles:i32 = 1;
+  var cycles:i32= 1;
   var start:i64 = undefined;
 
   const A = try R.matrix(N,N);
   const alu = try array.new_Array2D_double(N,N);
   const pivot = try heap.c_allocator.alloc(usize,@intCast(usize,N));
+  init(pivot);
+  var sum:usize = 0;
   while (true):(cycles*=2){
     start = time.timestamp();
     var i:usize=0;
@@ -104,4 +109,9 @@ pub fn measureLU(N:i32,min_time:f64,R:* random.Random)anyerror!f64{
     if (@intToFloat(f64,end-start) >= min_time) break;
   }
   return lu.num_flops(@intCast(usize,N)) * @intToFloat(f64,cycles) / @intToFloat(f64,time.timestamp() - start) * 1e-6;
+}
+fn init(a:anytype)void{
+  for(a)|*v| {
+    v.* = 0;
+  }
 }

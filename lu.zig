@@ -3,7 +3,7 @@ const math = @import("std").math;
 pub fn num_flops(n:usize)f64{
   const nd = @intToFloat(f64,n);
 
-  return 2.0 * nd * nd / 3.0;
+  return 2.0 * nd * nd * nd/ 3.0;
 }
 pub fn factor(m:usize,n:usize,a:[][]f64,pivot:[]usize)usize{
   const min_mn = if (m<n) m else n;

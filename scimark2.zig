@@ -14,7 +14,7 @@ const LU_SIZE = 100;
 
 const LG_FFT_SIZE  = 1048576;
 const LG_SOR_SIZE = 1000;
-const LG_SPARSE_SIZE = 10000;
+const LG_SPARSE_SIZE_M = 10000;
 const LG_SPARSE_SIZE_nz = 1000000;
 const LG_LU_SIZE = 1000;
 
@@ -26,6 +26,8 @@ const TINY_LU_SIZE = 10;
 
 const stdout = std.io.getStdOut().outStream();
 pub fn main() !void {
+    const args = try std.process.argsAlloc(std.heap.c_allocator);
+    defer std.process.argsFree(std.heap.c_allocator, args);
     var a = try arr.new_Array2D_double(10, 10);
     var min_time:f64 = 2.0;
 
@@ -34,8 +36,26 @@ pub fn main() !void {
     var Sparse_size_M:i32 = SPARSE_SIZE_M;
     var Sparse_size_nz:i32 = SPARSE_SIZE_nz;
     var LU_size:i32 = LU_SIZE;
-
-
+    if (find(args,"-l"))|_|{
+      FFT_size = LG_FFT_SIZE;
+      SOR_size = LG_SOR_SIZE;
+      Sparse_size_M = LG_SPARSE_SIZE_M;
+      Sparse_size_nz = LG_SPARSE_SIZE_nz;
+      LU_size = LG_LU_SIZE;
+    }
+    if (find(args,"-t"))|val|{
+      if (args.len > val+1){
+        min_time = try std.fmt.parseFloat(f64,args[val+1]);
+      }
+      else {
+          try print_usage();
+          return;
+        }
+    }
+    if (find(args,"-h"))|_|{
+      try print_usage();
+      return;
+    }
     var R = random.new_seed(RANDOM_SEED);
     try print_banner();
     try stdout.print("Using {d:10.2} seconds min time per kernel\n",.{min_time});
@@ -58,4 +78,13 @@ fn print_banner()!void{
      try stdout.print("** SciMark2 Numeric Benchmark, see http://math.nist.gov/scimark **\n",.{});
      try stdout.print("** for details. (Results can be submitted to pozo@nist.gov)     **\n",.{});
      try stdout.print("**                                                              **\n",.{});
+}
+fn print_usage()!void{
+     try stdout.print("scimark2 -l -h -t min_time\n",.{});
+}
+fn find(args:[][]u8,needle:[]const u8)?usize{
+  for (args)|val,i| {
+    if(std.mem.startsWith(u8,val,needle))return i;
+  }
+  return null;
 }
