@@ -1,2 +1,2 @@
 This is scimark2 in zig. I am not impressed...
-comile with: zig build-exe -l c -O ReleaseFast scimark2.zig
+comile with: zig build-exe -O ReleaseFast scimark2.zig

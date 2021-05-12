@@ -2,7 +2,7 @@ const std = @import("std");
 const arr = @import("array.zig");
 const kernel =  @import("kernel.zig");
 const random = @import("Random.zig");
-
+const allocator = @import("allocator.zig").allocator;
 const RESOLUTION_DEFAULT = 2.0;
 const RANDOM_SEED = 101010;
 
@@ -26,8 +26,8 @@ const TINY_LU_SIZE = 10;
 
 const stdout = std.io.getStdOut().outStream();
 pub fn main() !void {
-    const args = try std.process.argsAlloc(std.heap.c_allocator);
-    defer std.process.argsFree(std.heap.c_allocator, args);
+    const args = try std.process.argsAlloc(allocator());
+    defer std.process.argsFree(allocator(), args);
     var a = try arr.new_Array2D_double(10, 10);
     var min_time:f64 = 2.0;
 
