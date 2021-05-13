@@ -102,6 +102,7 @@ pub fn measureLU(N:i32,min_time:f64,R:* random.Random)anyerror!f64{
 
   const A = try R.matrix(N,N);
   const alu = try array.new_Array2D_double(N,N);
+  defer array.Array2D_double_delete(alu);
   const pivot = try allocator().alloc(usize,@intCast(usize,N));
   defer allocator().free(pivot);
   init(pivot);
