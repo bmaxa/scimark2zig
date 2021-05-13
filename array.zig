@@ -1,5 +1,5 @@
 const allocator = @import("allocator.zig").allocator;
-pub fn new_Array2D_double(M: i32, N: i32) ![][]f64 {
+pub fn new_double(M: i32, N: i32) ![][]f64 {
     var rc: [][]f64 = try allocator().alloc([]f64, @intCast(usize, M));
     for (rc) |*l| {
         l.* = try allocator().alloc(f64, @intCast(usize, N));
@@ -9,13 +9,13 @@ pub fn new_Array2D_double(M: i32, N: i32) ![][]f64 {
     }
     return rc;
 }
-pub fn Array2D_double_delete(A: [][]f64) void {
+pub fn double_delete(A: [][]f64) void {
     for (A) |l| {
         allocator().free(l);
     }
     allocator().free(A);
 }
-pub fn Array2D_double_copy(B: [][]f64, A: [][]f64) void {
+pub fn double_copy(B: [][]f64, A: [][]f64) void {
     const remainder = B[0].len & 3;
     var i: usize = 0;
     while (i < B.len) : (i += 1) {

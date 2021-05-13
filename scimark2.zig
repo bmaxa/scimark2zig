@@ -1,5 +1,5 @@
 const std = @import("std");
-const arr = @import("array.zig");
+const array2D = @import("array.zig");
 const kernel =  @import("kernel.zig");
 const random = @import("Random.zig");
 const allocator = @import("allocator.zig").allocator;
@@ -28,7 +28,6 @@ const stdout = std.io.getStdOut().outStream();
 pub fn main() !void {
     const args = try std.process.argsAlloc(allocator());
     defer std.process.argsFree(allocator(), args);
-    var a = try arr.new_Array2D_double(10, 10);
     var min_time:f64 = 2.0;
 
     var FFT_size:i32 = FFT_SIZE;

@@ -5,7 +5,7 @@ const sor = @import("sor.zig");
 const montecarlo = @import("MonteCarlo.zig");
 const sparse = @import("SparseCompRow.zig");
 const lu = @import("lu.zig");
-const array = @import("array.zig");
+const array2D = @import("array.zig");
 const allocator = @import("allocator.zig").allocator;
 pub fn measureFFT(N:i32,min_time:f64,R:* random.Random)!f64 {
   const twoN = 2*N;
@@ -27,7 +27,7 @@ pub fn measureFFT(N:i32,min_time:f64,R:* random.Random)!f64 {
 }
 pub fn measureSOR(N:i32,min_time:f64,R:* random.Random)!f64{
   const G = try R.matrix(N,N);
-  defer array.Array2D_double_delete(G);
+  defer array2D.double_delete(G);
   var cycles:i32 = 1;
   var start:i64 = undefined;
   while (true):(cycles*=2) {
@@ -101,9 +101,9 @@ pub fn measureLU(N:i32,min_time:f64,R:* random.Random)anyerror!f64{
   var start:i64 = undefined;
 
   const A = try R.matrix(N,N);
-  defer array.Array2D_double_delete(A);
-  const alu = try array.new_Array2D_double(N,N);
-  defer array.Array2D_double_delete(alu);
+  defer array2D.double_delete(A);
+  const alu = try array2D.new_double(N,N);
+  defer array2D.double_delete(alu);
   const pivot = try allocator().alloc(usize,@intCast(usize,N));
   defer allocator().free(pivot);
   init(pivot);
@@ -112,7 +112,7 @@ pub fn measureLU(N:i32,min_time:f64,R:* random.Random)anyerror!f64{
     start = time.timestamp();
     var i:usize=0;
     while(i<cycles):(i+=1){
-      array.Array2D_double_copy(alu,A);
+      array2D.double_copy(alu,A);
       _ = lu.factor(@intCast(usize,N),@intCast(usize,N),alu,pivot);
     }
     const end = time.timestamp();
