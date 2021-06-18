@@ -3,7 +3,7 @@ const MDIG = 32;
 const ONE = 1;
 const m1 = (ONE << (MDIG - 2)) + ((ONE << (MDIG - 2)) - ONE);
 const m2 = ONE << MDIG / 2;
-const heap = @ import("std").heap;
+const heap = @import("std").heap;
 var dm1: f64 = 1.0/@intToFloat(f64,m1) ;
 
 pub const Random = struct {

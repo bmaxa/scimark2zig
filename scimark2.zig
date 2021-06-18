@@ -24,7 +24,7 @@ const TINY_SPARSE_SIZE_M = 10;
 const TINY_SPARSE_SIZE_nz = 50;
 const TINY_LU_SIZE = 10;
 
-const stdout = std.io.getStdOut().outStream();
+const stdout = std.io.getStdOut().writer();
 pub fn main() !void {
     const args = try std.process.argsAlloc(allocator());
     defer std.process.argsFree(allocator(), args);
