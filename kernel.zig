@@ -38,7 +38,7 @@ pub fn measureSOR(N:i32,min_time:f64,R:* random.Random)!f64{
   }
   return sor.num_flops(N,N,cycles)/@intToFloat(f64,time.timestamp()-start) * 1e-6;
 }
-pub fn measureMonteCarlo(min_time:f64,R:*random.Random)f64{
+pub fn measureMonteCarlo(min_time:f64,_:*random.Random)f64{
   var cycles:i32 =1;
   var sum:f64 = 0;
   var start:i64 = undefined;
@@ -107,7 +107,7 @@ pub fn measureLU(N:i32,min_time:f64,R:* random.Random)anyerror!f64{
   const pivot = try allocator().alloc(usize,@intCast(usize,N));
   defer allocator().free(pivot);
   init(pivot);
-  var sum:usize = 0;
+//  var sum:usize = 0;
   while (true):(cycles*=2){
     start = time.timestamp();
     var i:usize=0;
